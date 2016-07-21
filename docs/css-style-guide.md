@@ -15,7 +15,7 @@ Styling consists of several elements:
  1. **Mixins, functions and variables** which avoid repetition and help ensure design consistency
  1. **Resets** which set sensible defaults for various elements
  1. **Basic element styles**
- 1. **Components**. These are re-usable building blocks which use BEM-namng rules (see below). These form the majority of CSS rules.
+ 1. **Components**. These are re-usable building blocks which use BEM-naming rules (see below). These form the majority of CSS rules.
 
 The SASS for Hypothesis projects is organized into several parts:
 
