@@ -185,7 +185,9 @@ Only include changes which are interesting to users of the package or
 application, and use a description they will be able to understand.
 ****
 
-[Unreleased]
+## [Unreleased]
+
+### Changed
 """.format(repo=args.repo, tag=args.tag))
     print(format_list([item_label(pr) for pr in pr_details]))
 
