@@ -10,6 +10,7 @@ The `docs/` folder contains our style guides and other documentation which is
 useful when writing Hypothesis code across different projects.
 
 * The [CSS Style Guide](docs/css-style-guide.md)
+* Guidelines for [creating accessible web user interfaces](docs/accessibility.md)
 
 ## Packages
 
