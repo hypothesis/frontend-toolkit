@@ -74,7 +74,8 @@ The SASS for Hypothesis projects is organized into several parts:
  * Use a `u-` prefix for utility classes. eg. A class for hiding DOM elements would be called `u-hidden`
 
 ### Classes Used in Code
-* Only reference classes with `js-` and `is-` prefixes in JavaScript code, except for tests where other classes may be referenced
+
+* Only reference classes with `js-` and `is-` prefixes in JavaScript code
 * Use names with a `js-` prefix for handle or "ref" classes that are used by JS to get a reference to particular DOM elements. These classes should not appear in stylesheets
 
 ## SASS Features
