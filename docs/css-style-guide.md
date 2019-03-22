@@ -110,7 +110,7 @@ The SASS for Hypothesis projects is organized into several parts:
 
 ## Browser Support
 
- * Hypothesis projects should be functional on Internet Explorer 10 and above. CSS features that are only available in newer browsers can still be used but the site should behave gracefully in older browsers
+ * Hypothesis projects should be functional on Internet Explorer 11 and above. CSS features that are only available in newer browsers can still be used but the site should behave gracefully in older browsers
 
 ## Further Reading
 
