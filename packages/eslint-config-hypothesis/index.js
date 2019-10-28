@@ -16,7 +16,6 @@ module.exports = {
     // eslint:recommended rules
     'array-callback-return': 'error',
     'block-scoped-var': 'error',
-    'comma-dangle': ['error', 'always-multiline'],
     'consistent-this': ['error', 'self'],
     'consistent-return': 'error',
     curly: 'error',
