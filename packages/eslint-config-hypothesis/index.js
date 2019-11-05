@@ -13,10 +13,14 @@ module.exports = {
     Promise: false,
   },
   rules: {
-    // eslint:recommended rules
+    // Standard ESLint rules.
+    //
+    // See https://eslint.org/docs/rules/.
+    //
+    // Stylistic rules are omitted for things that are handled automatically
+    // by Prettier.
     'array-callback-return': 'error',
     'block-scoped-var': 'error',
-    'comma-dangle': ['error', 'always-multiline'],
     'consistent-this': ['error', 'self'],
     'consistent-return': 'error',
     curly: 'error',
@@ -41,10 +45,15 @@ module.exports = {
     'one-var-declaration-per-line': ['error', 'always'],
     strict: ['error', 'safe'],
 
-    // ES2015+ style rules
+    // Stylistic rules about use of ES2015+ features.
+    //
+    // See https://eslint.org/docs/rules/#ecmascript-6
     'no-var': 'error',
 
     // plugin:react/recommended rules
+    //
+    // See https://github.com/yannickcr/eslint-plugin-react#list-of-supported-rules
+    // and https://reactjs.org/docs/hooks-rules.html#eslint-plugin
     'react/self-closing-comp': 'error',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
