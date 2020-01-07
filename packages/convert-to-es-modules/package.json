@@ -1,0 +1,17 @@
+{
+  "name": "convert-to-es-modules",
+  "version": "1.0.0",
+  "description": "Convert CommonJS to ES module syntax",
+  "main": "index.js",
+  "repository": "https://github.com/hypothesis/frontend-toolkit",
+  "author": "Robert Knight <robertknight@hypothes.is>",
+  "license": "BSD-2-Clause",
+  "private": true,
+  "dependencies": {
+    "@babel/core": "^7.7.7",
+    "coffee-script": "^1.12.7",
+    "glob": "^7.1.6",
+    "recast": "^0.18.5",
+    "resolve": "^1.14.2"
+  }
+}
