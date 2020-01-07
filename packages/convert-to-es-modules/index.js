@@ -16,12 +16,24 @@ function parse(code) {
 }
 
 /**
- * Analyze the exports of a CommonJS module and return `true` if the module
- * should be considered to have a "default" export.
+ * Print a transformed AST using Recast, preserving the original source of any
+ * unmodified nodes.
  */
-function detectDefaultExport(code) {
-  let hasDefaultExport = false;
+function printAST(ast) {
+  const output = recast.print(ast, {
+    quote: "single",
+  });
+  return output.code;
+}
 
+/**
+ * Find all the CommonJS/Node `module.exports` assignments in a source file and invoke
+ * `callback` with the Babel AST path.
+ *
+ * @param {string} code - Source code of module
+ * @param {Function} callback - Callback invoked with Babel AST path object
+ */
+function processCommonJSExports(code, callback) {
   const ast = parse(code);
 
   babelTraverse(ast, {
@@ -42,8 +54,24 @@ function detectDefaultExport(code) {
         return;
       }
 
-      hasDefaultExport = path.node.right.type !== "ObjectExpression";
+      callback(path);
     }
+  });
+
+  return ast;
+}
+
+/**
+ * Analyze the exports of a CommonJS module and return `true` if the module
+ * should be considered to have a "default" export.
+ */
+function detectDefaultExport(code) {
+  let hasDefaultExport = false;
+
+  processCommonJSExports(code, path => {
+    hasDefaultExport =
+      types.isObjectExpression(path.node.right) &&
+      areValuesAllIdentifiers(path.node.right);
   });
 
   return hasDefaultExport;
@@ -54,8 +82,7 @@ function detectDefaultExport(code) {
  * `callback` with `(path, dependencyPath, absoluteDependencyPath)` where
  * `path` is a Babel AST path.
  */
-function processCommonJSImports(modulePath, callback) {
-  const code = fs.readFileSync(modulePath).toString();
+function processCommonJSImports(code, modulePath, callback) {
   const ast = parse(code);
   babelTraverse(ast, {
     CallExpression(path) {
@@ -88,16 +115,17 @@ function processCommonJSImports(modulePath, callback) {
 /**
  * Convert CommonJS/Node `require` statements to ES `import` syntax.
  *
+ * @param {string} code - Module source
  * @param {string} modulePath - Absolute path to the JS module to convert.
  * @param {Object} hasDefaultExport - A map of absolute paths to dependencies to
  *   booleans indicating whether the module has a default export or not.
  */
-function convertCommonJSImports(modulePath, hasDefaultExport) {
+function convertCommonJSImports(code, modulePath, hasDefaultExport) {
   const getImportCategory = dependency =>
     dependency.startsWith(".") ? "local" : "npm";
-  let prevImportCategory;
 
   const ast = processCommonJSImports(
+    code,
     modulePath,
     (path, requirePath, requireAbsPath) => {
       let esImportDecl;
@@ -195,21 +223,62 @@ function convertCommonJSImports(modulePath, hasDefaultExport) {
         // `import` declaration.
         const leadingComments = cjsRequireStatement.node.leadingComments || [];
         esImportDecl.comments = [...leadingComments];
-        prevImportCategory = importCategory;
 
         cjsRequireStatement.replaceWith(esImportDecl);
       }
     }
   );
 
-  const output = recast.print(ast, {
-    quote: "single"
-  });
+  const output = printAST(ast);
 
   // Recast does not preserve blank lines between imports after converting them
   // from `require` to `import` syntax. Since we group imports according to
   // simple rules, we can fix up the imports with a simple script.
-  return groupImports(output.code);
+  return groupImports(output);
+}
+
+/**
+ * Test whether an object literal is a "simple" mapping of names to identifiers.
+ *
+ * When such expressions appear in a `module.exports` assignment they can be
+ * converted to an export list (`export { foo, bar as baz, ... }`).
+ */
+function areValuesAllIdentifiers(objectExpressionNode) {
+  return objectExpressionNode.properties.every(node =>
+    types.isIdentifier(node.value)
+  );
+}
+
+/**
+ * Convert CommonJS exports assignments (`module.exports = ...`, `exports = ...`)
+ * into ES module export declarations.
+ *
+ * @param {string} code
+ * @return {string} The converted code
+ */
+function convertCommonJSExports(code) {
+  const ast = processCommonJSExports(code, path => {
+    let exportDecl;
+    if (
+      types.isObjectExpression(path.node.right) &&
+      areValuesAllIdentifiers(path.node.right)
+    ) {
+      const objNode = path.node.right;
+      const exportSpecifiers = objNode.properties.map(propNode =>
+        types.exportSpecifier(propNode.key, propNode.value)
+      );
+      exportDecl = types.exportNamedDeclaration(null, exportSpecifiers);
+    } else {
+      exportDecl = types.exportDefaultDeclaration(path.node.right);
+    }
+
+    // Replace parent ExpressionStatement with export declaration.
+    const leadingComments = path.node.leadingComments || [];
+    exportDecl.comments = [...leadingComments];
+    path.parentPath.replaceWith(exportDecl);
+  });
+
+  return printAST(ast);
 }
 
 /**
@@ -299,14 +368,33 @@ function getJavaScriptSource(modulePath, transpilers = {}) {
   return code;
 }
 
-const srcGlobs = process.argv[2];
-const srcPaths = glob.sync(srcGlobs);
+let srcGlob;
+
+const program = require("commander");
+program
+  .option("-c, --config <path>", "Path to JSON configuration file")
+  .option("--log", "Write transformed code to stdout instead of modifying file")
+  .option("-i, --convert-imports")
+  .option("-e, --convert-exports")
+  .arguments("<paths>")
+  .action(paths => {
+    srcGlob = paths;
+  });
+
+program.parse(process.argv);
+
+let config = {};
+if (program.config) {
+  config = JSON.parse(fs.readFileSync(program.config));
+}
+
+const srcPaths = glob.sync(srcGlob);
 const transpilers = {
   ".coffee": code => require("coffee-script").compile(code)
 };
 
 // Step 1: Find all the modules `require`-d by the modules we are going to convert.
-console.log(`Finding direct dependencies of files matching "${srcGlobs}"...`);
+console.log(`Finding direct dependencies of files matching "${srcGlob}"...`);
 const modulePaths = unique(
   srcPaths.flatMap(srcPath => {
     const requiredPaths = [];
@@ -342,10 +430,8 @@ modulePaths.forEach(absPath => {
 
 // Apply overrides for modules where the type of default export is not correctly
 // determined automatically by the logic above.
-const hasDefaultExportOverrides = {
-  "dom-anchor-text-quote": false,
-  katex: false
-};
+const hasDefaultExportOverrides = {};
+Object.assign(hasDefaultExportOverrides, config.hasDefaultExport);
 
 Object.keys(hasDefaultExportOverrides).forEach(dependency => {
   const absPath = resolve.sync(dependency, {
@@ -355,15 +441,22 @@ Object.keys(hasDefaultExportOverrides).forEach(dependency => {
 });
 
 // Step 3. Re-process each module and convert top-level CommonJS requires to
-// imports. The following statements are recognized, and they must be top-level
-// statements:
-//
-// a) require('foo');
-// b) var foo = require('foo');
-// c) var { foo } = require('foo');
-
+// imports.
 console.log("Converting CommonJS imports to `import ... from ...` syntax...");
 srcPaths.forEach(path => {
-  const code = convertCommonJSImports(path, hasDefaultExport);
-  fs.writeFileSync(path, code);
+  let code = fs.readFileSync(path).toString();
+
+  if (program.convertImports) {
+    code = convertCommonJSImports(code, path, hasDefaultExport);
+  }
+
+  if (program.convertExports) {
+    code = convertCommonJSExports(code);
+  }
+
+  if (program.log) {
+    console.log(code);
+  } else {
+    fs.writeFileSync(path, code);
+  }
 });

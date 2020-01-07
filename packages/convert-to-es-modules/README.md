@@ -30,5 +30,38 @@ $ cd path/to/your/project
 # nb. `/path/to/frontend-toolkit` refers to the absolute path where you have
 # cloned this repository.
 
-$ node /path/to/frontend-toolkit/convert-to-es-modules/index.js 'src/**/*.js'
+$ node /path/to/frontend-toolkit/convert-to-es-modules/index.js -i -e 'src/**/*.js'
 ```
+
+The `-i` flag enables conversion of imports. The `-e` flag enables conversion
+of exports.
+
+## Options
+
+The script accepts several options. Use the `--help` argument for details.
+
+## Configuration
+
+The tool accepts extended configuration in a JSON file specified via the
+`--config` argument:
+
+```
+$ node convert-to-es-modules/index.js --config config.json 'src/**/*.js'
+```
+
+The following configuration options are available:
+
+**hasDefaultExport**
+
+Override the tool's detection of whether a module has a default export or not:
+
+```
+{
+  "hasDefaultExport": {
+    "katex": false
+  }
+}
+```
+
+This option is useful if the tool's simple heuristics do not correctly detect
+whether an npm package should be treated as having a default export or not.
