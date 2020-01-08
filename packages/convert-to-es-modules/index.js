@@ -250,6 +250,16 @@ function areValuesAllIdentifiers(objectExpressionNode) {
 }
 
 /**
+ * Move the comments from before one source AST node to a destination AST node.
+ */
+function transferComments(fromNode, toNode) {
+  const comments = fromNode.leadingComments || [];
+  fromNode.leadingComments = [];
+  fromNode.comments = [];
+  toNode.comments = [...comments];
+}
+
+/**
  * Convert CommonJS exports assignments (`module.exports = ...`, `exports = ...`)
  * into ES module export declarations.
  *
@@ -290,9 +300,14 @@ function convertCommonJSExports(code) {
             types.isClassDeclaration(localPath)
           ) {
             handled = true;
-            localPath.replaceWith(
-              types.exportNamedDeclaration(localPath.node, [])
-            );
+            const exportDecl = types.exportNamedDeclaration(localPath.node, []);
+
+            // Move any comments above the function/class declaration so that
+            // they appear above the export declaration instead of between
+            // the `export` keyword and the function/class declaration.
+            transferComments(localPath.node, exportDecl);
+
+            localPath.replaceWith(exportDecl);
           }
         }
 
@@ -327,9 +342,14 @@ function convertCommonJSExports(code) {
           types.isClassDeclaration(exportBinding.path.node)
         ) {
           handled = true;
-          exportBinding.path.replaceWith(
-            types.exportDefaultDeclaration(exportBinding.node)
-          );
+          const exportDecl = types.exportDefaultDeclaration(exportBinding.path.node);
+
+          // Move any comments above the function/class declaration so that
+          // they appear above the export declaration instead of between
+          // the `export` keyword and the function/class declaration.
+          transferComments(exportBinding.path.node, exportDecl);
+
+          exportBinding.path.replaceWith(exportDecl);
         }
       }
 
