@@ -473,9 +473,14 @@ console.log(`Finding direct dependencies of files matching "${srcGlob}"...`);
 const modulePaths = unique(
   srcPaths.flatMap(srcPath => {
     const requiredPaths = [];
-    processCommonJSImports(srcPath, (path, requirePath, requireAbsPath) => {
-      requiredPaths.push(requireAbsPath);
-    });
+    const code = fs.readFileSync(srcPath).toString();
+    processCommonJSImports(
+      code,
+      srcPath,
+      (path, requirePath, requireAbsPath) => {
+        requiredPaths.push(requireAbsPath);
+      }
+    );
     return requiredPaths;
   })
 );
