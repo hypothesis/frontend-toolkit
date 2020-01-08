@@ -65,3 +65,13 @@ Override the tool's detection of whether a module has a default export or not:
 
 This option is useful if the tool's simple heuristics do not correctly detect
 whether an npm package should be treated as having a default export or not.
+
+## References
+
+For information on parsing and transforming code with Babel, see the
+[Babel Handbook](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/en/README.md).
+
+To see the parsed structures of various code, see [AST Explorer](https://astexplorer.net).
+
+For information about Recast, which enables preserving unmodified parts of the code,
+see the [Recast repo](https://github.com/benjamn/recast).
