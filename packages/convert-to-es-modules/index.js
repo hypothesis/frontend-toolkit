@@ -70,8 +70,8 @@ function detectDefaultExport(code) {
 
   processCommonJSExports(code, path => {
     hasDefaultExport =
-      types.isObjectExpression(path.node.right) &&
-      areValuesAllIdentifiers(path.node.right);
+      !types.isObjectExpression(path.node.right) ||
+      !areValuesAllIdentifiers(path.node.right);
   });
 
   return hasDefaultExport;
