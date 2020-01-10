@@ -106,5 +106,10 @@ describe("convert-exports", () => {
       const code = `module.exports = SomeClass;`;
       assert.equal(detectDefaultExport(code), true);
     });
+
+    it("returns `true` if module has a default ES export", () => {
+      const code = `export default function foo () {}`;
+      assert.equal(detectDefaultExport(code), true);
+    });
   });
 });
