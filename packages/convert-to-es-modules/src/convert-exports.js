@@ -28,11 +28,11 @@ function areValuesAllIdentifiers(objectExpressionNode) {
  * Find all the CommonJS/Node `module.exports` assignments in a source file and invoke
  * `callback` with the Babel AST path.
  *
- * @param {string} code - Source code of module
+ * @param {string|AST} code - Source code of module as either source code or a parsed AST
  * @param {Function} callback - Callback invoked with Babel AST path object
  */
 function processCommonJSExports(code, callback) {
-  const ast = parse(code);
+  const ast = typeof code === "string" ? parse(code) : code;
 
   traverse(ast, {
     AssignmentExpression(path) {
@@ -179,16 +179,25 @@ function convertCommonJSExports(code) {
 }
 
 /**
- * Analyze the exports of a CommonJS module and return `true` if the module
+ * Analyze the exports of a CommonJS or ES module and return `true` if the module
  * should be considered to have a "default" export.
  */
 function detectDefaultExport(code) {
   let hasDefaultExport = false;
 
-  processCommonJSExports(code, path => {
+  const ast = parse(code);
+
+  processCommonJSExports(ast, path => {
     hasDefaultExport =
       !types.isObjectExpression(path.node.right) ||
       !areValuesAllIdentifiers(path.node.right);
+  });
+
+  // Find ES default exports.
+  traverse(ast, {
+    ExportDefaultDeclaration(path) {
+      hasDefaultExport = true;
+    }
   });
 
   return hasDefaultExport;
