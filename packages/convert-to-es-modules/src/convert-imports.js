@@ -5,6 +5,7 @@ const path = require("path");
 const resolve = require("resolve");
 
 const { parse, printAST, traverse, types } = require("./util");
+const { groupImportsInFile } = require("./sort-imports");
 
 /**
  * Return the absolute path of a dependency `require`'d by `modulePath`
@@ -25,49 +26,6 @@ function absoluteDependencyPath(modulePath, dependency) {
     basedir: path.dirname(modulePath),
     extensions: [".js", ".coffee"]
   });
-}
-
-/**
- * Extract the module path from an ES `import` statement.
- */
-function getImportPath(line) {
-  const importMatch = line.match(/^import.*from ['"](.*)['"];?/);
-  return importMatch ? importMatch[1] : null;
-}
-
-/**
- * Insert blank lines between local and third-party package imports.
- *
- * @param {string} code
- */
-function groupImports(code) {
-  // This function assumes the code is conventional enough that we can get
-  // away with simple regex parsing rather than doing a full syntax-aware parse
-  // with Babel or Recast.
-  const lines = code.split("\n");
-  const category = path => {
-    if (path.startsWith("./") || path.startsWith("../")) {
-      return "same-package";
-    } else {
-      return "vendor-package";
-    }
-  };
-
-  let prevImportPath = null;
-  for (let i = 0; i < lines.length; i++) {
-    const importPath = getImportPath(lines[i]);
-    if (
-      prevImportPath &&
-      importPath &&
-      category(importPath) !== category(prevImportPath)
-    ) {
-      lines.splice(i, 0, "");
-      ++i;
-    }
-    prevImportPath = importPath;
-  }
-
-  return lines.join("\n");
 }
 
 /**
@@ -227,7 +185,7 @@ function convertCommonJSImports(code, modulePath, hasDefaultExport) {
   // Recast does not preserve blank lines between imports after converting them
   // from `require` to `import` syntax. Since we group imports according to
   // simple rules, we can fix up the imports with a simple script.
-  return groupImports(output);
+  return groupImportsInFile(output);
 }
 
 module.exports = { convertCommonJSImports, processCommonJSImports };

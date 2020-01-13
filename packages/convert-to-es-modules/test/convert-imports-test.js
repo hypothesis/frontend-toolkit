@@ -25,7 +25,7 @@ describe("convert-imports", () => {
         hasDefaultExport
       );
 
-      assert.equal(output, expected);
+      assert.equal(output.trim(), expected.trim());
     });
 
     it("converts CommonJS imports to default ES imports", () => {
@@ -45,7 +45,7 @@ describe("convert-imports", () => {
         hasDefaultExport
       );
 
-      assert.equal(output, expected);
+      assert.equal(output.trim(), expected.trim());
     });
 
     it("converts named imports to ES imports", () => {
@@ -66,7 +66,47 @@ describe("convert-imports", () => {
         hasDefaultExport
       );
 
-      assert.equal(output, expected);
+      assert.equal(output.trim(), expected.trim());
+    });
+
+    [
+      // Input imports already grouped.
+      `
+        var foo = require("commander");
+        var bar = require("commander");
+
+        var local = require("./convert-imports-test");
+        var local2 = require("../src/convert-imports");
+      `,
+
+      // Input imports not grouped.
+      `
+        var foo = require("commander");
+        var bar = require("commander");
+        var local = require("./convert-imports-test");
+        var local2 = require("../src/convert-imports");
+      `
+    ].forEach(input => {
+      it("inserts a blank line between local and vendor imports", () => {
+        const expected = `
+        import * as foo from 'commander';
+        import * as bar from 'commander';
+
+        import * as local2 from '../src/convert-imports';
+
+        import * as local from './convert-imports-test';
+        `;
+
+        const hasDefaultExport = {};
+
+        const output = convertCommonJSImports(
+          input,
+          __filename,
+          hasDefaultExport
+        );
+
+        assert.equal(output.trim(), expected.trim());
+      });
     });
   });
 });
