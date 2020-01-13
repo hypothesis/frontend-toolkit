@@ -91,30 +91,30 @@ function groupImportsInFile(code) {
     importGroups.push([match.index, match.index + match[0].length - 1]);
   }
 
-  // Sort and sub-group each group of imports.
   let output = [];
-  let prevGroupEndLine = null;
+  let prevEnd = -1;
 
   for (let [start, end] of importGroups) {
-    if (prevGroupEndLine !== null) {
-      // Add the non-import lines between the two import groups.
-      output.push("");
-      output.push(...lines.slice(prevGroupEndLine + 1, start));
+    const linesBeforeGroup = lines.slice(prevEnd + 1, start);
+    if (linesBeforeGroup.length > 0) {
+      if (prevEnd !== -1) {
+        output.push("");
+      }
+      output.push(...linesBeforeGroup);
       output.push("");
     }
+
     const importLines = lines.slice(start, end + 1);
     const sortedLines = sortAndGroupImports(importLines);
     output.push(...sortedLines);
-    prevGroupEndLine = end;
+    prevEnd = end;
   }
 
   // Add the non-import lines after the final import group.
-  if (prevGroupEndLine !== null) {
+  if (prevEnd !== -1) {
     output.push("");
-  } else {
-    prevGroupEndLine = -1;
   }
-  output.push(...lines.slice(prevGroupEndLine + 1));
+  output.push(...lines.slice(prevEnd + 1));
 
   return output.join("\n");
 }
