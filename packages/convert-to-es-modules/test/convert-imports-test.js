@@ -108,5 +108,33 @@ describe("convert-imports", () => {
         assert.equal(output.trim(), expected.trim());
       });
     });
+
+    it("strips 'use strict' literals", () => {
+      const input = `
+'use strict';
+
+const foo = require("commander");
+
+function test() {
+  "use strict";
+}
+      `;
+
+      const expected = `
+import * as foo from 'commander';
+
+function test() {
+}
+`;
+
+      const hasDefaultExport = {};
+      const output = convertCommonJSImports(
+        input,
+        __filename,
+        hasDefaultExport
+      );
+
+      assert.equal(output.trim(), expected.trim());
+    });
   });
 });

@@ -180,7 +180,17 @@ function convertCommonJSImports(code, modulePath, hasDefaultExport) {
     }
   );
 
-  const output = printAST(ast);
+  let output = printAST(ast);
+
+  // Filter out "use strict" directives as modules are always strict.
+  // We use a regex rather than AST traversal here because the parser ignores
+  // these directives when parsing the source as a module and does not include them
+  // in the AST.
+  const useStrictDirective = /^\s*['"]use strict['"][\s;]*$/g;
+  output = output
+    .split("\n")
+    .filter(line => !line.match(useStrictDirective))
+    .join("\n");
 
   // Recast does not preserve blank lines between imports after converting them
   // from `require` to `import` syntax. Since we group imports according to
