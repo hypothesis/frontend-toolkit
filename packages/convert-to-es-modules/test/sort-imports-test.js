@@ -78,5 +78,27 @@ class Woot {}
         assert.equal(output.trim(), input.trim());
       });
     });
+
+    it("preserves lines before first import", () => {
+      const input = `
+// This is a test
+const foo = 42;
+
+import bar from "bar";
+`;
+      const output = groupImportsInFile(input);
+      assert.equal(output.trim(), input.trim());
+    });
+
+    it("preserves lines after last import", () => {
+      const input = `
+import bar from "bar";
+
+// This is a test
+const foo = 42;
+`;
+      const output = groupImportsInFile(input);
+      assert.equal(output.trim(), input.trim());
+    });
   });
 });

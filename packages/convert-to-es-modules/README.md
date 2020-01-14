@@ -66,6 +66,31 @@ Override the tool's detection of whether a module has a default export or not:
 This option is useful if the tool's simple heuristics do not correctly detect
 whether an npm package should be treated as having a default export or not.
 
+## Limitations
+
+There are several limitations / scenarios which this script will not handle
+automatically. The recommended approach to using it is to refactor occurrences
+of these patterns before running this script, although you can also fix them up
+afterwards:
+
+- Only `var … = require` statements at the top level of a module are converted
+  to imports. This is because `import` statements must occur at the top level
+  of a file (ie. outside of any conditionals, loops or functions).
+- Detection of whether to use namespace imports (`import * as foo from "foo"`)
+  vs default imports (`import foo from "foo"`) is based on heuristics about
+  what the imported module assigns to `module.exports` (if it is a CommonJS
+  module) or whether it has an `export default` declaration (if it is an ES
+  module). The heuristic is to assume that `module.exports` assignments where
+  the right-hand side is an object literal with only identifiers as values
+  (eg. `module.exports = { foo, bar: baz }`) should be converted to namespace
+  imports. Anything else results in a default export. This heuristic may not
+  always be correct.
+- CommonJS modules which logically have both a default export (eg. a function)
+  and named exports (eg. auxilliary functions) are implemented by assigning
+  properties to the object which is the default export. When converting to ES
+  modules the idiomatic approach would be to have a default export and separate
+  named exports. This script cannot make this change automatically.
+
 ## References
 
 For information on parsing and transforming code with Babel, see the
