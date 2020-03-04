@@ -7,7 +7,7 @@
   "repository": "hypothesis/frontend-toolkit",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Warning: no test specified\" && exit 0"
   },
   "peerDependencies": {
     "eslint-plugin-mocha": "^5.2.1",
