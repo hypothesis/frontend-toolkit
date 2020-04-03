@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-hypothesis",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A base ESLint configuration for Hypothesis projects",
   "homepage": "https://hypothes.is",
   "bugs": "https://github.com/hypothesis/frontend-toolkit/issues",
