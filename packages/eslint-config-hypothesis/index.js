@@ -9,9 +9,8 @@ module.exports = {
   },
   extends: ['eslint:recommended', 'plugin:react/recommended'],
   globals: {
-    assert: false,
-    sinon: false,
-    Promise: false,
+    assert: 'readonly',
+    sinon: 'readonly',
   },
   rules: {
     // Standard ESLint rules.
