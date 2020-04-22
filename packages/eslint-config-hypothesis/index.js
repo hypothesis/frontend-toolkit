@@ -2,7 +2,10 @@
 
 module.exports = {
   env: {
-    es6: true,
+    // Specify global variables and ES language version.
+    //
+    // See https://eslint.org/docs/user-guide/configuring#specifying-environments
+    es2020: true,
     mocha: true,
     commonjs: true,
     browser: true,
@@ -63,7 +66,6 @@ module.exports = {
   },
 
   parserOptions: {
-    ecmaVersion: 2018,
     ecmaFeatures: {
       jsx: true,
     },
