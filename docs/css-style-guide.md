@@ -127,7 +127,7 @@ Where 'component' is a re-usable building block (eg. a tab bar),
 
 ## Browser Support
 
-Hypothesis applications should work within any modern web browser (a version of Chrome, Firefox, Safari, Microsoft Edge, or equivalent released within the last 12 months). Note that as of 1 July 2020, Hypothesis will no longer support Internet Explorer.
+Hypothesis applications should work within any modern web browser (a version of Chrome, Firefox, Safari, Microsoft Edge, or equivalent released within the last 12 months). Note that as of 1 July 2020, Hypothesis does not support Internet Explorer.
 
 ## Further Reading
 
