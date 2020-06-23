@@ -1,20 +1,26 @@
 # Hypothesis CSS Style Guide
 
-To enable efficient and safe evolution of our front end projects, we follow a few basic principles for styling:
+To enable efficient and safe evolution of our front end projects, we follow a few basic guidelines for styling:
 
 - Organize styles into components for encapsulation, ease of reuse and refactoring
+- Extract reusable patterns whenever possible
 - Use simple, non-nested class selectors to avoid specificity problems
-- Be careful with CSS preprocessor features. Use mixins to avoid repetition and variables to ensure consistency. Avoid SASS' `@extends` feature.
-- Use [naming](#naming) conventions to indicate which classes are purely presentational and which are referenced in code
+- Apply [Atomic Design](https://atomicdesign.bradfrost.com/) methodology loosely.
+  We are currently experimenting with applying atomic and molecular patterns.
+- Use [naming](#naming) conventions to provide semantic information or indicate
+  classes that are purely presentational
 - Use modern CSS features (flexbox) for layout
+- Use [SASS](https://sass-lang.com/) for implementing CSS
 
 ## Organization
 
 Styling consists of several elements:
 
-1.  **Mixins, functions and variables** which avoid repetition and help ensure design consistency
-1.  **Resets** which set sensible defaults for various elements
-1.  **Basic element styles**
+1.  **Resets** and **Basic element styles** set sensible defaults for various elements
+1.  **Utility classes** provide basic, core styling for elements that need no other
+    style rules
+1.  **Variables** capture basic rules and settings
+1.  **Mixins** provide reusable patterns, both at atomic and composition/molecular levels
 1.  **Components**. These are re-usable building blocks which use BEM-naming rules (see below). These form the majority of CSS rules.
 
 To make maintenance easier as projects scale and make it easier to see
@@ -22,41 +28,39 @@ locally where particular variables, mixins etc. come from, and avoid unexpected
 conflicts, our projects make use of the [SASS module
 system](https://sass-lang.com/blog/the-module-system-is-launched).
 
-The SASS for a Hypothesis project is organized into several parts:
+### SASS Organization
 
-- An entry-point file which imports all of the components used in the project or section of the project,
-  structured like this:
+A project's styling is contained within SASS modules that fill the
+roles of the elements listed above.
 
-  ```scss
-  // Reset default browser styles
-  @use 'base/reset';
-  // Basic universal styling for elements (eg. links)
-  @use 'base/elements';
+An entry-point file (per project or per project sub-section) imports the project's
+resets, basic element styles, utility classes and SASS module for each component, e.g.:
 
-  // Utility classes
-  @use 'base/utils';
+```scss
+// Resets and basic universal styling for elements
+@use 'base/reset';
+@use 'base/elements';
 
-  // Components
-  @use 'components/input-field';
-  @use 'components/fancy-modal';
-  @use 'components/a-widget';
-  ```
+// Utility classes
+@use 'base/utils';
 
-- Modules which define variables and mixins, but no CSS classes, for use by
-  other modules
+// Components
+@use 'components/input-field';
+@use 'components/fancy-modal';
+@use 'components/a-widget';
+```
 
-- Modules which define universal styles such as standardizing defaults across
-  browsers (CSS resets) or basic element styles
+Resets, basic element styles and utility classes are made available in output
+CSS by the entry-point SASS file.
 
-- Component modules which define the styles for re-usable components, including the different
-  variations of a component and media queries for responsive layout. These may
-  import variables/mixins using `@use` but should not import any files which
-  directly generate their own CSS.
+Component modules define the styles for re-usable components, including the different
+variations of a component and media queries for responsive layout. These components
+can `@use` (import) variables and mixins as needed for their styling.
 
 ## Selectors
 
 - Use class selectors rather than element or ID selectors.
-- Avoid descendant selectors. They [are slow](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Writing_efficient_CSS#Avoid_the_descendant_selector.21) and more importantly, make it easy to create unintended results due to naming clashes or [specificity conflicts](http://css.maxdesign.com.au/selectutorial/advanced_conflict.htm).
+- Avoid descendant selectors in most cases. They [are slow](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Writing_efficient_CSS#Avoid_the_descendant_selector.21) and more importantly, make it easy to create unintended results due to naming clashes or [specificity conflicts](http://css.maxdesign.com.au/selectutorial/advanced_conflict.htm).
 
 ```scss
 // Bad
@@ -91,10 +95,14 @@ Where 'component' is a re-usable building block (eg. a tab bar),
 - Only reference classes with `js-` and `is-` prefixes in JavaScript code
 - Use names with a `js-` prefix for handle or "ref" classes that are used by JS to get a reference to particular DOM elements. These classes should not appear in stylesheets
 
-## SASS Features
+## Working in SASS
 
-- Use variables, functions and mixins
-- [Avoid @extends](https://www.sitepoint.com/avoid-sass-extend/). Use mixins instead
+- Use mixins whenever possible within component SASS rules. If there is no applicable mixin,
+  use variable values for rules when possible. Otherwise, add specific rules—and comment them.
+- Use utility classes, but sparingly, for elements that don't have other specific CSS rules. For
+  elements that need additional styling, don't use a utility class. Instead, use the corresponding
+  utility mixin within the SASS rules for that element.
+- Be careful with CSS preprocessor features. Use mixins to avoid repetition and variables to ensure consistency. Avoid SASS' `@extends` feature.
 - Use of nesting to avoid repetition of component names is acceptable, but only one or two levels as otherwise it can be difficult to see what CSS rules are generated:
 
 ```scss
@@ -109,22 +117,17 @@ Where 'component' is a re-usable building block (eg. a tab bar),
 }
 ```
 
-## Colors and Typography
-
-- Use colors and typography values defined in a shared `variables` module
-  rather than hard-coding colors in component styles.
-
-## Layout
-
-- Use flexbox instead of floats for component layout. This avoids the need for clearfix and other hacks. Note that flexbox [may not be appropriate](https://hyp.is/AVKcwo8BvTW_3w8LypJ5/jakearchibald.com/2014/dont-use-flexbox-for-page-layout/) for overall page layout
-
-## Vendor Prefixes
-
-- Avoid vendor prefixes. Use [autoprefixer](https://github.com/postcss/autoprefixer) to add those.
+- Use color, typography and other values defined in the shared `variables` module
+  (or, even better: use a utility mixin) rather than hard-coding CSS rule values
+  in component CSS
+- We use flexbox instead for layout; there are some utility mixins and classes
+  to make component styling more convenient.
+- Avoid vendor prefixes ([autoprefixer](https://github.com/postcss/autoprefixer) will
+  add these automatically).
 
 ## Browser Support
 
-- Hypothesis projects should be functional on Internet Explorer 11 and above. CSS features that are only available in newer browsers can still be used but the site should behave gracefully in older browsers
+Hypothesis applications should work within any modern web browser (a version of Chrome, Firefox, Safari, Microsoft Edge, or equivalent released within the last 12 months). Note that as of 1 July 2020, Hypothesis does not support Internet Explorer.
 
 ## Further Reading
 
