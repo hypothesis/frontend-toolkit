@@ -13,7 +13,7 @@ idioms from earlier versions of the language (eg. classes over constructor funct
 
 _The native features typically enable better tooling._
 
-Projects may use any ES language features which meet the following criteria:
+Projects may use any ES language features which meet all of the following criteria:
 
 1. Supported by the tooling we use (Babel, ESLint)
 2. Supported natively in the stable release of at least two major browsers.
@@ -97,12 +97,6 @@ When typechecking is used for a project, expressions that are difficult to
 check can be ignored using `// @ts-ignore` comments. As with ESLint suppressions,
 try to scope these to the smallest possible scope.
 
-### prop-types
-
-The [prop-types](https://reactjs.org/docs/typechecking-with-proptypes.html) package
-is used to document component properties and enable basic runtime validation
-of props in debug builds.
-
 ## Testing
 
 Hypothesis makes use of extensive unit testing to help prevent regressions.
@@ -129,6 +123,12 @@ and class-based. Hypothesis uses [function components](https://reactjs.org/docs/
 together with the ["hooks" API](https://reactjs.org/docs/hooks-intro.html)
 for managing internal state and effects. As an exception, the class-based API
 may be used if there is no hook API equivalent.
+
+### Validating props with prop-types
+
+The [prop-types](https://reactjs.org/docs/typechecking-with-proptypes.html) package
+is used to document Preact component properties and enable basic runtime validation
+of props in debug builds.
 
 ### Testing components
 
