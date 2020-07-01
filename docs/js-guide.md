@@ -97,6 +97,8 @@ When typechecking is used for a project, expressions that are difficult to
 check can be ignored using `// @ts-ignore` comments. As with ESLint suppressions,
 try to scope these to the smallest possible scope.
 
+For more help on this, see the [Typechecking FAQs](typechecking-faqs.md) page.
+
 ## Testing
 
 Hypothesis makes use of extensive unit testing to help prevent regressions.
