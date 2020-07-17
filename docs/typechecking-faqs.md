@@ -89,19 +89,32 @@ const parentEl = /** @type {HTMLElement} */ (someElement.parentElement)
 
 (Aside: In `.ts` files there is a shorter way to write this. In the TS expression `someElement.parentElement!.someProperty` the `!` is a shorthand for "trust me, I know this isn't null. I don't know of an equivalent that you can use in `.js` files).
 
-## How do I tell TS the type of a `useRef`?
+## How should I specify types when using `useRef` or `useState` hooks?
+
+For `useRef` and `useState`, the recommended pattern is to pass an argument to these hooks, specify the type on that
+and let TypeScript infer the rest:
 
 ```js
-const myRef = /** @type {import("preact/hooks").Ref<HTMLElement>} */ (useRef())
+// [1] In the common case where a ref is initially null and is set to an HTML element after
+// the first render, use a union.
+const myRef = useRef(/** @type {HTMLElement|null} */ (null));
+
+// [2] If a ref always has the same type, everything can be inferred from the argument.
+const aCounter = useRef(42);
+
+// [3] If state always has the same type, everything can be inferred from the argument.
+const [isLoading, setLoading] = useState(false);
+
+// [4] If state is initialized with a value of one type and later replaced with
+// a value of a different type, use a union.
+const [error, setError] = useState(/** @type {Error|null} */ (null));
 ```
 
-If you have many refs, you can create an alias for the import to reduce repetition:
+In example 1, a useful quirk of the way `useRef` is specified is that any `null` gets "erased"
+from the inferred type so you can later use `myRef.current` without an explicit null check.
+This quirk is also a limitation - if there is an unusual scenario where you later reset `myRef.current`
+back to null and forget to check, TS won't warn you.
 
-```js
-/**
- * @template T
- * @typedef {import("preact/hooks").Ref<T>} Ref
- */
+Note that this pattern is not limited to hooks, it can work for any function where the type
+of the result can be inferred if the type of the argument is known.
 
-const myRef = /** @type {Ref<HTMLElement>} */ (useRef())
-```
