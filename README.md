@@ -19,5 +19,5 @@ The `packages/` folder contains a set of npm packages that provide resources suc
 as base config files for front-end tooling, utility scripts etc. that are
 useful across multiple Hypothesis projects. These include:
 
- - [**eslint-config-hypothesis**](packages/eslint-config-hypothesis) - A [sharable configuration](http://eslint.org/docs/developer-guide/shareable-configs)
+ - [**eslint-config-hypothesis**](packages/eslint-config-hypothesis) - A [shareable configuration](http://eslint.org/docs/developer-guide/shareable-configs)
    for ESLint
