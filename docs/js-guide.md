@@ -87,17 +87,13 @@ details on how to specify various types correctly.
 
 ### Typechecking
 
-We are investigating the use of the TypeScript compiler for some
-projects to check the semantic correctness of code based on JSDoc annotations
-and provide a better development experience in IDEs.
+Our more recent and larger projects, such as the client and LMS frontend, use the TypeScript compiler to check
+the semantic correctness of code based on JSDoc annotations. This also enables a better development experience in IDEs
+such as [Visual Studio Code](https://code.visualstudio.com) or Vim with [ALE](https://github.com/dense-analysis/ale).
+
 In these projects a [tsconfig.json file](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
-with the `allowJs` and `checkJs` settings is used.
-
-When typechecking is used for a project, expressions that are difficult to
-check can be ignored using `// @ts-ignore` comments. As with ESLint suppressions,
-try to scope these to the smallest possible scope.
-
-For more help on this, see the [Typechecking FAQs](typechecking-faqs.md) page.
+with the `allowJs` and `checkJs` settings is used. See the [Typechecking FAQs](typechecking-faqs.md) page for
+recommendations on JSDoc / TypeScript usage in projects.
 
 ## Testing
 
@@ -126,11 +122,12 @@ together with the ["hooks" API](https://reactjs.org/docs/hooks-intro.html)
 for managing internal state and effects. As an exception, the class-based API
 may be used if there is no hook API equivalent.
 
-### Validating props with prop-types
+### Documenting and checking props
 
-The [prop-types](https://reactjs.org/docs/typechecking-with-proptypes.html) package
-is used to document Preact component properties and enable basic runtime validation
-of props in debug builds.
+Projects that use TypeScript to statically check code can use JSDoc to document
+component props and check usage. Projects that do not use TypeScript can instead use
+the [prop-types](https://reactjs.org/docs/typechecking-with-proptypes.html) package
+as a more limited form of validation that happens at runtime.
 
 ### Testing components
 
