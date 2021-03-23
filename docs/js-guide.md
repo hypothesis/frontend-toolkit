@@ -3,9 +3,12 @@
 This document explains the tools and conventions that we use to maintain
 quality and consistency of our JavaScript code.
 
+The rationales for various conventions are documented briefly _in italics_.
+Exceptions are noted **in bold**.
+
 ## Language style guide
 
-### Use of language features
+### Use of newer ES language features
 
 Projects should generally prefer native ES language features over equivalent
 idioms from earlier versions of the language (eg. classes over constructor functions,
@@ -33,10 +36,51 @@ Projects may use any ES language features which meet all of the following criter
 As an exception, [JSX](https://reactjs.org/docs/introducing-jsx.html) is used for
 creating UI components.
 
+### Module naming
+
+Modules should use lowercase, hyphen-separated names (`helpful-module.js`).
+
+**Exception:** Modules whose primary export is a Preact component should use a
+CamelCase name that matches the component name (eg. `ShinyButton.js`). _This is a
+React/Preact ecosystem convention._
+
+### Import structure
+
+Imports should be placed at the top of a module, grouped into sections by their
+relation to the current project:
+
+- Platform (node, browser) imports
+- Third-party imports
+- Imports from other directories in the current package
+- Imports from the same directory in the current package
+
+Within each group import lines should be sorted alphabetically by module path.
+
+```
+import { readFile } from 'fs';
+
+import { render } from 'markdown';
+
+import { fetchData } from './data-source';
+import { formatDate } from './utils/date';
+```
+
+### Default exports
+
+Modules should always use named exports rather than default exports.
+
+_Using named exports helps with grep-ability as it encourages the
+symbol to have the same name everywhere it is used. Automated refactoring tools
+are more likely to update all references to a symbol when renaming it._
+
+**Exception:** Modules whose primary export is a single Preact component should
+default-export that component. _This is a React/Preact ecosystem convention._
+
 ### Variable declarations
 
-Variables should be declared with `const` where possible, as this makes it clear
-that the variable is only assigned in one place.
+Variables should be declared with `const` where possible, or `let` if not.
+
+_Use of `const` makes it clear that a variable is only assigned in one place._
 
 ## Formatting code
 
