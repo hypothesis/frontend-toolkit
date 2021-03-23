@@ -49,10 +49,10 @@ React/Preact ecosystem convention._
 Imports should be placed at the top of a module, grouped into sections by their
 relation to the current project:
 
-- Platform (node, browser) imports
-- Third-party imports
-- Imports from other directories in the current package
-- Imports from the same directory in the current package
+1. Platform (node, browser) imports
+2. Third-party imports
+3. Imports from other directories in the current package
+4. Imports from the same directory in the current package
 
 Within each group import lines should be sorted alphabetically by module path.
 
@@ -67,7 +67,7 @@ import { formatDate } from './utils/date';
 
 ### Default exports
 
-Modules should always use named exports rather than default exports.
+Avoid default exports. Use named exports instead.
 
 _Using named exports helps with grep-ability as it encourages the
 symbol to have the same name everywhere it is used. Automated refactoring tools
