@@ -56,7 +56,7 @@ relation to the current project:
 
 Within each group import lines should be sorted alphabetically by module path.
 
-```
+```js
 import { readFile } from 'fs';
 
 import { render } from 'markdown';
@@ -87,7 +87,7 @@ _Use of `const` makes it clear that a variable is only assigned in one place._
 All of our projects use [Prettier](https://prettier.io) to format JavaScript code,
 with the following `.prettierrc` configuration:
 
-```
+```json
 {
   "arrowParens": "avoid",
   "singleQuote": true
