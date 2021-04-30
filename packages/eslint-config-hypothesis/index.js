@@ -69,7 +69,6 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 2021,
   },
 
   plugins: ['mocha', 'react', 'react-hooks'],
