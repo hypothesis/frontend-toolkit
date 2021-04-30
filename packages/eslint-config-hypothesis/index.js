@@ -5,7 +5,7 @@ module.exports = {
     // Specify global variables and ES language version.
     //
     // See https://eslint.org/docs/user-guide/configuring#specifying-environments
-    es2020: true,
+    es2021: true,
     mocha: true,
     commonjs: true,
     browser: true,
