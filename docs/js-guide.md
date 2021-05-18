@@ -82,6 +82,27 @@ Variables should be declared with `const` where possible, or `let` if not.
 
 _Use of `const` makes it clear that a variable is only assigned in one place._
 
+### Identifier naming
+
+Variables, functions (except for Preact components) and object properties should
+use camelCase naming. Acronyms should be lower-case if they are the first "word"
+of an identifier or upper-case otherwise. Classes and Preact components should
+use PascalCase naming.
+
+_These conventions match web platform APIs and the Preact/React ecosystem_.
+
+Correct examples:
+
+```js
+const pdfTitle = ...;
+
+function getPDFTitle() {
+   ...
+}
+
+class PDFIntegration { ... };
+```
+
 ## Formatting code
 
 All of our projects use [Prettier](https://prettier.io) to format JavaScript code,
