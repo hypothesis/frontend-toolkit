@@ -103,6 +103,37 @@ function getPDFTitle() {
 class PDFIntegration { ... };
 ```
 
+#### Ref naming
+
+Preact does not allow the `ref` prop to be accessed by on non-HTML components. Instead it
+offers a wrapper method called [forwardRef](https://preactjs.com/guide/v10/switching-to-preact/#forwardref)
+to extract the ref for you. Unfortunately the wrapper method is included with `preact/compat` which
+is a library we currently don't import nor want to because of a number of global side effects. For
+this reason, we simply use a custom property with a "Ref" suffix and pass the ref object to
+that property. For example, `buttonRef`, `panelRef` or `fooBarRef` would all be valid names.
+It is then up to the component to pull out the ref passed to that prop and attach it to the
+underlying `HTMLElement`.
+
+e.g.
+
+```js
+/**
+ * @typedef FooBarProps
+ * @prop {import('preact').Ref<HTMLInputElement>} fooBarRef
+ */
+
+/**
+ * @param {FooBarProps} props
+ */
+export default function FooBar({
+  fooBarRef
+}) {
+   return (
+      <input type="text" ref={fooBarRef}/>
+   )
+}
+```
+
 ## Formatting code
 
 All of our projects use [Prettier](https://prettier.io) to format JavaScript code,
