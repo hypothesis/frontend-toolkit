@@ -1,129 +1,39 @@
 # Hypothesis CSS Style Guide
 
-To enable efficient and safe evolution of our front end projects, we follow a few basic guidelines for styling:
+Hypothesis is transitioning to a utility-first approach for CSS styling, supported by [Tailwind CSS](https://tailwindcss.com/). We use [SASS](https://sass-lang.com/) to build output CSS stylesheets.
 
-- Organize styles into components for encapsulation, ease of reuse and refactoring
-- Extract reusable patterns whenever possible
-- Use simple, non-nested class selectors to avoid specificity problems
-- Apply [Atomic Design](https://atomicdesign.bradfrost.com/) methodology loosely.
-  We are currently experimenting with applying atomic and molecular patterns.
-- Use [naming](#naming) conventions to provide semantic information or indicate
-  classes that are purely presentational
-- Use modern CSS features (flexbox) for layout
-- Use [SASS](https://sass-lang.com/) for implementing CSS
+Using Tailwind's utility-first approach obviates the need to spend much time thinking about or documenting how CSS classes should be named or organized, and can prevent us from creating tempting but sometimes confusing or unmaintainable abstractions.
 
-## Organization
+Our current CSS conventions are:
 
-Styling consists of several elements:
+- Use a utility-first approach and let it help you shape your components:
+  - Use Tailwind utility classes within the source markup for components whenever possible
+  - Find yourself repeating classes in a component? It may be a signal to break that component up. Be liberal with the creation of sub-components to avoid repeating yourself (especially within the same component module).
+- Use Tailwind configuration to express and define the design system:
+  - Each application starts with the [shared Tailwind preset](https://github.com/hypothesis/frontend-shared/blob/main/src/tailwind.preset.js) provided by the `frontend-shared` package
+  - Each application may extend that Tailwind preset with local values (e.g. [the client's current configuration](https://github.com/hypothesis/client/blob/master/tailwind.config.mjs))
+- Make use of layers:
+  - Each CSS (SASS) entrypoint should enable the [Tailwind `base`, `components` and `utilities` layers](https://tailwindcss.com/docs/functions-and-directives#layer) and should structure any partials/imports along the lines of those layers.
+  - Using Tailwind layers for now puts us in a prime position to take advantage of native CSS layers.
+- Be thoughtful when authoring external CSS:
+  - External CSS: it's sometimes necessary! We're not aiming for an airtight system in which there is no external CSS. Use your judgment. On the other hand, check first: can you do it with Tailwind/a utility class instead?
+  - Add external CSS to the relevant Tailwind layer, and use the [`@apply` directive](https://tailwindcss.com/docs/functions-and-directives#apply) to inline Tailwind utility classes.
+  - Be alert if you find yourself trying to come up with class names or Tailwind configuration property names. Re-consider if there is a Tailwind-y way to avoid naming and abstractions.
+- Don't rely too much on SASS' features:
+  - Avoid SASS variables, mixins, and functions.
+  - Remove unused SASS (variables, mixins, etc.) as you encounter them.
+- Respect specificity and the cascade (in external CSS):
+  - Most selectors should have a specificity of 0 1 0 (equates to a single classname, e.g.[`.my-selector`](https://polypane.app/css-specificity-calculator/#selector=.my-selector)).
+  - Use layers (ordering) to your advantage. Given equal specificity, something in the `utilities` layer should override something in the `components` layer, e.g.
+  - Be very wary about selectors with higher specificity
+  - Avoid nesting, especially deep nesting, in SASS
+- Style with empathy
+  - We use [`classnames`](https://www.npmjs.com/package/classnames) in our UI components to split up long lists of utility classes and provide commenting ([example](https://github.com/hypothesis/client/blob/6d50b1b5465c2f1c83d6bb3f673e8266b5396c85/src/annotator/components/AdderToolbar.js))
+  - We comment our external CSS carefully and structure it for best comprehensibility ([example](https://github.com/hypothesis/client/blob/master/src/styles/annotator/components/Buckets.scss))
 
-1.  **Resets** and **Basic element styles** set sensible defaults for various elements
-1.  **Utility classes** provide basic, core styling for elements that need no other
-    style rules
-1.  **Variables** capture basic rules and settings
-1.  **Mixins** provide reusable patterns, both at atomic and composition/molecular levels
-1.  **Components**. These are re-usable building blocks which use BEM-naming rules (see below). These form the majority of CSS rules.
+## Transitioning and legacy SASS
 
-To make maintenance easier as projects scale and make it easier to see
-locally where particular variables, mixins etc. come from, and avoid unexpected
-conflicts, our projects make use of the [SASS module
-system](https://sass-lang.com/blog/the-module-system-is-launched).
-
-### SASS Organization
-
-A project's styling is contained within SASS modules that fill the
-roles of the elements listed above.
-
-An entry-point file (per project or per project sub-section) imports the project's
-resets, basic element styles, utility classes and SASS module for each component, e.g.:
-
-```scss
-// Resets and basic universal styling for elements
-@use 'base/reset';
-@use 'base/elements';
-
-// Utility classes
-@use 'base/utils';
-
-// Components
-@use 'components/input-field';
-@use 'components/fancy-modal';
-@use 'components/a-widget';
-```
-
-Resets, basic element styles and utility classes are made available in output
-CSS by the entry-point SASS file.
-
-Component modules define the styles for re-usable components, including the different
-variations of a component and media queries for responsive layout. These components
-can `@use` (import) variables and mixins as needed for their styling.
-
-## Selectors
-
-- Use class selectors rather than element or ID selectors.
-- Avoid descendant selectors in most cases. They [are slow](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Writing_efficient_CSS#Avoid_the_descendant_selector.21) and more importantly, make it easy to create unintended results due to naming clashes or [specificity conflicts](http://css.maxdesign.com.au/selectutorial/advanced_conflict.htm).
-
-```scss
-// Bad
-.tab-bar {
-  .tab { } // Generates '.tab-bar .tab'
-}
-
-// Good
-.tab-bar__tab { ... }
-```
-
-## Naming
-
-- Use [BEM-style](http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/) naming for components:
-
-```scss
-.component { ... }
-.component__element { ... }
-.component__element--modifier { ... }
-```
-
-Where 'component' is a re-usable building block (eg. a tab bar),
-'element' is some part of the component which is not reusable on its own, and
-'--modifier' represents some static variation of a component (eg.
-`btn--danger` for a button which performs some destructive action)
-
-- Use `is-$state` names for state classes (eg. `is-active`) that are dynamically added or removed from JS code
-- Use a `u-` prefix for utility classes. eg. A class for hiding DOM elements would be called `u-hidden`
-
-### Classes Used in Code
-
-- Only reference classes with `js-` and `is-` prefixes in JavaScript code
-- Use names with a `js-` prefix for handle or "ref" classes that are used by JS to get a reference to particular DOM elements. These classes should not appear in stylesheets
-
-## Working in SASS
-
-- Use mixins whenever possible within component SASS rules. If there is no applicable mixin,
-  use variable values for rules when possible. Otherwise, add specific rules—and comment them.
-- Use utility classes, but sparingly, for elements that don't have other specific CSS rules. For
-  elements that need additional styling, don't use a utility class. Instead, use the corresponding
-  utility mixin within the SASS rules for that element.
-- Be careful with CSS preprocessor features. Use mixins to avoid repetition and variables to ensure consistency. Avoid SASS' `@extends` feature.
-- Use of nesting to avoid repetition of component names is acceptable, but only one or two levels as otherwise it can be difficult to see what CSS rules are generated:
-
-```scss
-.tab-bar {
-  &__tab { ... } // OK - Generates '.tab-bar__tab'
-
-  .tab { ... }    // AVOID - Generates '.tab-bar .tab'
-
-  &__tab {
-    &__icon { ... } // AVOID - Difficult to see what resulting selector is
-  }
-}
-```
-
-- Use color, typography and other values defined in the shared `variables` module
-  (or, even better: use a utility mixin) rather than hard-coding CSS rule values
-  in component CSS
-- We use flexbox instead for layout; there are some utility mixins and classes
-  to make component styling more convenient.
-- Avoid vendor prefixes ([autoprefixer](https://github.com/postcss/autoprefixer) will
-  add these automatically).
+At time of writing, Hypothesis front-end apps are midway through transitioning a from BEM-convention, heavy-mixin, highly-abstracted SASS structure to Tailwind/utility-first. Existing non-Tailwind SASS should be migrated as time allows.
 
 ## Browser Support
 
@@ -131,6 +41,7 @@ Hypothesis applications should work within any modern web browser (a version of 
 
 ## Further Reading
 
+- [Tailwind CSS documentation](https://tailwindcss.com/docs/installation): Tailwind documents it and explains it so we don't have to
 - [Trello's CSS Guidelines](https://github.com/trello/trellisheets) . See also the 'Further Reading'
   section at the end of that article
 - [Strategies for Keeping CSS specificity low](https://css-tricks.com/strategies-keeping-css-specificity-low) explains the problems with CSS specificity and why most formalized approaches to CSS advocate flat structures
