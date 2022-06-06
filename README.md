@@ -35,7 +35,7 @@ Prerequisites:
 To publish a new version of a package:
 
 1. Ensure any changes you want to include have been merged. Then check out the
-   `master` branch of the repository and switch to the package's directory.
+   `main` branch of the repository and switch to the package's directory.
 2. Add an entry for the new version of the package in the changelog.
    See https://keepachangelog.com/en/1.0.0/ for details of the format that we use.
 3. Run `npm version` with appropriate flags (eg. `npm version minor`) to update
