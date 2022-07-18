@@ -10,7 +10,11 @@ module.exports = {
     commonjs: true,
     browser: true,
   },
-  extends: ['eslint:recommended', 'plugin:react/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
+  ],
   globals: {
     assert: 'readonly',
     sinon: 'readonly',
@@ -75,8 +79,7 @@ module.exports = {
 
   settings: {
     react: {
-      pragma: 'createElement',
-      version: '16.8',
+      version: '18.0',
     },
   },
 };
