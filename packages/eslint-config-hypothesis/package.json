@@ -1,6 +1,7 @@
 {
   "name": "eslint-config-hypothesis",
   "version": "2.6.0",
+  "type": "module",
   "description": "A base ESLint configuration for Hypothesis projects",
   "homepage": "https://hypothes.is",
   "bugs": "https://github.com/hypothesis/frontend-toolkit/issues",
@@ -9,10 +10,16 @@
   "scripts": {
     "test": "echo \"Warning: no test specified\" && exit 0"
   },
+  "devDependencies": {
+    "eslint": "^9.12.0",
+    "eslint-plugin-mocha": "^10.4.3",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^5.0.0"
+  },
   "peerDependencies": {
-    "eslint-plugin-mocha": ">=5.2.1",
-    "eslint-plugin-react": ">=7.12.4",
-    "eslint-plugin-react-hooks": ">=3.0.0"
+    "eslint-plugin-mocha": ">=10.4.0",
+    "eslint-plugin-react": ">=7.34.0",
+    "eslint-plugin-react-hooks": ">=5.0.0"
   },
   "keywords": [],
   "author": "",
