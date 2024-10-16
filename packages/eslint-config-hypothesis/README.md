@@ -9,17 +9,22 @@ To use it:
 2. Add the config's peer dependencies (see `peerDependencies` in `package.json`)
    to your project's dependencies
 3. Add an ESLint config file to the repository which extends the "hypothesis"
-   config. For example, a `.eslintrc` file with the following content:
+   config. For example, a `eslint.config.js` file with the following content:
 
    ```js
-   {
-     "extends": ["hypothesis"]
-   }
+   import hypothesis from 'eslint-config-hypothesis';
+
+   export default [
+     ...hypothesis,
+     {
+       // Other project config
+     },
+   ];
    ```
 
 ## Rule notes
 
-- All rules from `eslint:recommended` are enabled
+- All `recommended` rules from `@eslint/js` are enabled
 - All rules are configured to produce errors and not warnings. This is based on
   the principle that an issue is either worth fixing or should be ignored, and
   warnings just add noise
