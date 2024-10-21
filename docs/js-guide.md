@@ -1,7 +1,7 @@
-# JavaScript guide
+# JavaScript / TypeScript guide
 
 This document explains the tools and conventions that we use to maintain
-quality and consistency of our JavaScript code.
+quality and consistency of our JavaScript and TypeScript code.
 
 The rationales for various conventions are documented briefly _in italics_.
 Exceptions are noted **in bold**.
@@ -103,6 +103,9 @@ function getPDFTitle() {
 class PDFIntegration { ... };
 ```
 
+**Exception:** Objects containing deserialized API response bodies or serializable API request bodies may
+use non-camel-case identifier names.
+
 #### Ref naming
 
 Preact does not allow the `ref` prop to be accessed by on non-HTML components. Instead it
@@ -116,18 +119,14 @@ underlying `HTMLElement`.
 
 e.g.
 
-```js
-/**
- * @typedef FooBarProps
- * @prop {import('preact').Ref<HTMLInputElement>} fooBarRef
- */
+```tsx
+export type FooBarProps = {
+  fooBarRef: Ref<HTMLInputElement>;
+};
 
-/**
- * @param {FooBarProps} props
- */
 export default function FooBar({
   fooBarRef
-}) {
+}: FooBarProps) {
    return (
       <input type="text" ref={fooBarRef}/>
    )
@@ -183,13 +182,16 @@ details on how to specify various types correctly.
 
 ### Typechecking
 
-Our more recent and larger projects, such as the client and LMS frontend, use the TypeScript compiler to check
-the semantic correctness of code based on JSDoc annotations. This also enables a better development experience in IDEs
-such as [Visual Studio Code](https://code.visualstudio.com) or Vim with [ALE](https://github.com/dense-analysis/ale).
+Production code which runs in the browser should be written in TypeScript. Tooling which runs
+directly in Node can be written in JavaScript. JS scripts may have type annotations in the form
+of JSDoc comments.
 
-In these projects a [tsconfig.json file](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
-with the `allowJs` and `checkJs` settings is used. See the [Typechecking FAQs](typechecking-faqs.md) page for
-recommendations on JSDoc / TypeScript usage in projects.
+Unit and integration tests are generally written in JS and not type-checked.
+This is because our tests often create mocks/fakes which take liberties when implementing the type
+they stand in for (eg. only implementing the used subset of an API). As a consequence any type
+checking would have to be relaxed (eg. using `any` frequently).
+
+See the [Typechecking FAQs](typechecking-faqs.md) page for recommendations on JSDoc / TypeScript usage in projects.
 
 ## Testing
 
@@ -215,15 +217,7 @@ for guidance on conceptual issues.
 React/Preact provide several two main APIs for authoring components: function
 and class-based. Hypothesis uses [function components](https://reactjs.org/docs/components-and-props.html)
 together with the ["hooks" API](https://reactjs.org/docs/hooks-intro.html)
-for managing internal state and effects. As an exception, the class-based API
-may be used if there is no hook API equivalent.
-
-### Documenting and checking props
-
-Projects that use TypeScript to statically check code can use JSDoc to document
-component props and check usage. Projects that do not use TypeScript can instead use
-the [prop-types](https://reactjs.org/docs/typechecking-with-proptypes.html) package
-as a more limited form of validation that happens at runtime.
+for managing internal state and effects.
 
 ### Testing components
 
