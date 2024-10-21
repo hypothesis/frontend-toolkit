@@ -18,12 +18,13 @@ Put `@ts-ignore` in a comment to ignore the next line.
 Props are described using TypeScript and documented using JSDoc, like so:
 
 ```tsx
-type MyButtonProps = {
+export type MyButtonProps = {
   /** Text label for the button. */
   label: string;
 };
 
-function MyButton({ label }: MyButtonProps) {
+export default function MyButton({ label }: MyButtonProps) {
+  // Content here
 }
 ```
 
