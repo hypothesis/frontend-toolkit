@@ -17,7 +17,8 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
 
-      // Prop validation should be performed by TypeScript/JSDoc.
+      // Prop type checking is handled by TypeScript.
+      'react/no-unknown-property': 'off',
       'react/prop-types': 'off',
     },
     languageOptions: {
