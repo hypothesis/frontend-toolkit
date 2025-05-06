@@ -55,10 +55,17 @@ export default defineConfig(
 
   // Tests
   {
-    files: ['**/*-test.js'],
+    files: ['**/*-test.js', '**/test/*.js'],
     languageOptions: {
       globals: {
         ...vitest.environments.env.globals,
+
+        // We use `context` instead of `define` in many cases, as it was
+        // available with Mocha, before Vitest was adopted and replaced it.
+        // However, every project is responsible for aliasing `define` to
+        // `context` itself, by doing something in the lines of
+        // `globalThis.context ??= globalThis.describe`
+        context: true,
       },
     }
   }
