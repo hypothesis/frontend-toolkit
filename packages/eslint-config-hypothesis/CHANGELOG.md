@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.3.0] - 2025-05-06
+
+- Replace `eslint-plugin-mocha` with `@vitest/eslint-plugin` [#60](https://github.com/hypothesis/frontend-toolkit/pull/60)
+
 ## [v3.2.0] - 2025-02-17
 
 - Disable `react/no-unknown-property` rule in favor of TypeScript [#58](https://github.com/hypothesis/frontend-toolkit/pull/58)
