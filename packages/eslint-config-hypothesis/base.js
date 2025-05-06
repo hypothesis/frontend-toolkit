@@ -1,10 +1,10 @@
 import eslint from '@eslint/js';
-import mocha from 'eslint-plugin-mocha';
+import vitest from '@vitest/eslint-plugin';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 
-export default [
+export default defineConfig(
   eslint.configs.recommended,
-  mocha.configs.flat.recommended,
   {
     rules: {
       // Standard ESLint rules.
@@ -43,16 +43,6 @@ export default [
       //
       // See https://eslint.org/docs/rules/#ecmascript-6
       'no-var': 'error',
-
-      // mocha rules
-      'mocha/no-exclusive-tests': 'error',
-      'mocha/no-mocha-arrows': 'off',
-      'mocha/no-setup-in-describe': 'off',
-      'mocha/max-top-level-suites': 'off',
-      'mocha/consistent-spacing-between-blocks': 'off',
-      'mocha/no-top-level-hooks': 'off',
-      'mocha/no-sibling-hooks': 'off',
-      'mocha/no-identical-title': 'off',
     },
     languageOptions: {
       globals: {
@@ -61,5 +51,15 @@ export default [
         assert: 'readonly',
       }
     },
+  },
+
+  // Tests
+  {
+    files: ['**/*-test.js'],
+    languageOptions: {
+      globals: {
+        ...vitest.environments.env.globals,
+      },
+    }
   }
-];
+);
